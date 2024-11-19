@@ -2,7 +2,8 @@ from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from rest_framework_simplejwt.views import TokenRefreshView
 from .views import (VideoViewSet, CategoryViewSet, MyTokenObtainPairView,
-UserRegisterView, UserProfileView, LikedVideosView, ChangePasswordView, UploadedVideosView)
+UserRegisterView, UserProfileView, LikedVideosView, ChangePasswordView, UploadedVideosView,
+UserListView, ToggleAdminStatusView, ToggleUserActiveStatusView)
 
 
 router = DefaultRouter()
@@ -19,4 +20,8 @@ urlpatterns = [
     path('api/liked-videos/', LikedVideosView.as_view(), name='liked_videos'),
     path('api/change-password/', ChangePasswordView.as_view(), name='change-password'),
     path('api/user-videos/', UploadedVideosView.as_view(), name='user-videos'), 
+    path('api/users/', UserListView.as_view(), name='user_list'),
+    path('api/users/<int:user_id>/toggle-admin/', ToggleAdminStatusView.as_view(), name='toggle_admin'),
+    path('users/<int:user_id>/toggle-active/', ToggleUserActiveStatusView.as_view(), name='toggle_user_active'),
+
 ]

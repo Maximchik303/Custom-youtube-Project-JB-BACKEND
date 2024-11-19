@@ -7,7 +7,8 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
-from rest_framework.decorators import api_view
+from django.contrib.auth.models import User
+from rest_framework.views import APIView
 from django.contrib.auth.hashers import check_password
 
 
@@ -152,3 +153,41 @@ class ChangePasswordView(generics.UpdateAPIView):
         else:
             permission_classes = [permissions.AllowAny]
         return [permission() for permission in permission_classes]
+
+class UserListView(APIView):
+    permission_classes = [IsAdminUser]
+
+    def get(self, request):
+        users = User.objects.all()
+        user_data = [{"id": user.id, "username": user.username, "is_staff": user.is_staff, "is_active": user.is_active,} for user in users]
+        return Response(user_data)
+
+class ToggleAdminStatusView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def patch(self, request, user_id):
+        try:
+            user = User.objects.get(id=user_id)
+            if request.user.is_staff:  # Only staff/admin users can change admin status
+                user.is_staff = not user.is_staff  # Toggle admin status
+                user.save()
+                return Response({"message": "Admin status updated successfully."}, status=status.HTTP_200_OK)
+            else:
+                return Response({"error": "Permission denied."}, status=status.HTTP_403_FORBIDDEN)
+        except User.DoesNotExist:
+            return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
+
+class ToggleUserActiveStatusView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def patch(self, request, user_id):
+        try:
+            user = User.objects.get(id=user_id)
+            if request.user.is_staff:  # Only staff/admin users can toggle account status
+                user.is_active = not user.is_active  # Toggle account active status
+                user.save()
+                return Response({"message": "Account status updated successfully."}, status=status.HTTP_200_OK)
+            else:
+                return Response({"error": "Permission denied."}, status=status.HTTP_403_FORBIDDEN)
+        except User.DoesNotExist:
+            return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
