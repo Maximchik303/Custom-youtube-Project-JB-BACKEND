@@ -11,8 +11,6 @@ from rest_framework.decorators import api_view
 from django.contrib.auth.hashers import check_password
 
 
-
-
 class VideoViewSet(viewsets.ModelViewSet):
     serializer_class = VideoSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]  # Allow read for all, write for authenticated users
@@ -121,8 +119,14 @@ class LikedVideosView(generics.ListAPIView):
 
     def get_queryset(self):
         user = self.request.user
-        # Fetch liked videos and order by the timestamp of the Like in descending order
         return Video.objects.filter(like__user=user).order_by('-like__created_at')
+
+class UploadedVideosView(generics.ListAPIView):
+    serializer_class = VideoSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return Video.objects.filter(user=self.request.user).order_by('-createdTime')
     
 class ChangePasswordView(generics.UpdateAPIView):
     permission_classes = [permissions.IsAuthenticated]

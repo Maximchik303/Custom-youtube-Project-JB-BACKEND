@@ -2,7 +2,7 @@ from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from rest_framework_simplejwt.views import TokenRefreshView
 from .views import (VideoViewSet, CategoryViewSet, MyTokenObtainPairView,
-UserRegisterView, UserProfileView, LikedVideosView, ChangePasswordView)
+UserRegisterView, UserProfileView, LikedVideosView, ChangePasswordView, UploadedVideosView)
 
 
 router = DefaultRouter()
@@ -18,5 +18,5 @@ urlpatterns = [
     path('api/user/', UserProfileView.as_view(), name='user_profile'),
     path('api/liked-videos/', LikedVideosView.as_view(), name='liked_videos'),
     path('api/change-password/', ChangePasswordView.as_view(), name='change-password'),
-
+    path('api/user-videos/', UploadedVideosView.as_view(), name='user-videos'), 
 ]
