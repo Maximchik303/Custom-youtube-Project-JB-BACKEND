@@ -10,7 +10,7 @@ class Category(models.Model):
 class Video(models.Model):
     link = models.URLField(unique=True)
     description = models.TextField()
-    category = models.ForeignKey(Category, on_delete=models.CASCADE)
+    categories = models.ManyToManyField(Category, related_name='videos')  # Allow multiple categories
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     approved = models.BooleanField(default=False)
     createdTime = models.DateTimeField(auto_now_add=True)
@@ -19,6 +19,7 @@ class Video(models.Model):
 
     def __str__(self):
         return self.link
+
 
 class Like(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)

@@ -4,12 +4,18 @@ from .models import Video, Category, User
 
 class VideoSerializer(serializers.ModelSerializer):
     user = serializers.CharField(source='user.username', read_only=True)
-    category = serializers.PrimaryKeyRelatedField(queryset=Category.objects.all())  # Accept category ID
+    categories = serializers.PrimaryKeyRelatedField(queryset=Category.objects.all(), many=True)  # Handle multiple categories
 
     class Meta:
         model = Video
-        fields = ['id', 'link', 'description', 'category', 'user', 'approved', 'denied', 'createdTime', 'likes']
-        read_only_fields = ['id', 'createdTime', '`like`s', 'approved', 'user']  # user is set server-side
+        fields = ['id', 'link', 'description', 'categories', 'user', 'approved', 'denied', 'createdTime', 'likes']
+        read_only_fields = ['id', 'createdTime', 'likes', 'approved', 'user']  # user is set server-side
+
+    def validate_categories(self, value):
+        # Ensure that a video has 1 or 2 categories (adjust the logic if you need more specific validation)
+        if len(value) > 2:
+            raise serializers.ValidationError("A video can only have up to 2 categories.")
+        return value
 
     def validate_link(self, value):
         youtube_regex = r'^(https?\:\/\/)?(www\.youtube\.com|youtu\.?be)\/.+$'
